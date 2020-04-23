@@ -9,9 +9,8 @@ class session:
         
         # Window ist disabled
         options = webdriver.FirefoxOptions()
-        #options.add_argument('headless')
-        #options.add_argument("disable-gpu")
-        #options.add_argument("--log-level=3")
+        options.add_argument('--headless')
+        options.add_argument('--disable-gpu')
         
         try:
             # Versucht, Chrome Session zu erstellen
