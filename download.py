@@ -8,11 +8,12 @@ import requests
 import speech_recognition as sr
 import os
 from download_video import video
+from output import output
 
 class download:
     """ Downloaded alle Folgen """
     
-    def __init__(self, links, browser):
+    def __init__(self, links, browser, output):
         # Speichert Variablen
         
         self.links = links
@@ -20,6 +21,9 @@ class download:
         # Zählt alle Staffeln und Serien
         self.session = 1
         self.episode = 1
+        self.video_Links = {}
+        self.output = output
+        self.output.def_header("Hole Download Links")
     
     
     
@@ -30,42 +34,62 @@ class download:
         while self.session <= len(self.links):
             
             # Downloaded alle Folgen einer Staffel
-            self.get_site(self.links[self.session])
-            quit()
+            
+            self.video_Links[self.session] = self.get_site(self.links[self.session])
+            
             self.session += 1
+        
+        self.download_form_link()
     
     
+    
+    def download_form_link(self):
+        os.mkdir("Serie")
+        session = 1
+        
+        for i,v in self.video_Links.items():
+            os.mkdir("Serie/"+str(session))
+            episode = 1
+            print(i)
+            for a,b in v.items():
+                
+                r = requests.get(b)
+                des = "Serie/"+str(session)+"/"+str(episode)+".mp4"
+                with open(des, 'wb') as f:
+                    f.write(r.content)
+                episode += 1
+        session += 1
     
     
     def get_site(self, links):
         # Downloaded alle Folgen einer Staffel
         
         # Solange nicht alle Folgen einer Staffel abgearbeitet worden sind
+        episode = 1
+        ep = {}
         for i in links:
             
-            # Holt BS Link
-            self.get_site_link(i)
-            # Löst Recaptcha aus
-            self.trigger_recaptcha()
-            self.solve_recaptcha()
+            self.output.static_text("Staffel: "+str(self.session)+"\nFolge: "+str(episode))
+            stop = 0
             
-            self.browser.switch_to.default_content()
+            while stop == 0:
+                
+                # Holt BS Link
+                self.get_site_link(i)
+                # Löst Recaptcha aus
+                self.trigger_recaptcha()
+                stop = self.solve_recaptcha()
+                
+                self.browser.switch_to.default_content()
             
             self.delete_tabs()
             
-            self.download_video()
-            
-            break
-    
-    
-    
-    def create_session(self):
-        # Erstelle Session
+            ep[episode] = self.hoster()
+            episode += 1
         
-        print("Erstelle Firefox Session...")
-        s = session()
-        self.browser = s.new_session()
-        print("Session erstellt")
+        return ep
+    
+    
     
     
     def get_site_link(self, link):
@@ -82,15 +106,12 @@ class download:
         self.delete_tabs()
         
         # Trigger Recaptcha
-        self.browser.find_element_by_class_name("hoster-player").click()
+        try:
+            self.browser.find_element_by_class_name("hoster-player").click()
+        except:
+            r = 0
     
     
-    
-    def remove_popup(self):
-        
-        self.browser.switch_to.window(self.browser.window_handles[0])
-        self.browser.close()
-        self.browser.switch_to.window(self.browser.window_handles[0])
     
     
     
@@ -98,11 +119,15 @@ class download:
     def solve_recaptcha(self):
         
         sleep(5)
+        self.output.status("Versuche, Recaptcha zu lösen...")
         self.browser.switch_to.frame(self.browser.find_elements_by_tag_name("iframe")[5])
         
         self.recaptcha_wait("recaptcha-audio-button")
         
-        self.browser.find_element_by_id("recaptcha-audio-button").click()
+        try:
+            self.browser.find_element_by_id("recaptcha-audio-button").click()
+        except:
+            return 1
         
         self.recaptcha_wait("audio-source")
         
@@ -111,9 +136,31 @@ class download:
         self.convert()
         
         text = self.speech_to_text()
+        if text == 1:
+            return 0
         
         self.solve_answer(text)
+        
+        return self.control()
     
+    
+    
+    
+    def control(self):
+        
+        sleep(2)
+        
+        try:
+            innerHTML = self.browser.find_element_by_class_name("rc-audiochallenge-error-message").get_attribute("innerHTML")
+            if innerHTML == "":
+                self.output.status("Recaptcha wurde gelöst")
+                return 1
+            else:
+                self.output.status("Recaptcha wurde nicht gelöst... Wiederhole vorgang")
+                return 0
+        except Exception as e:
+            self.output.status("Recaptcha wurde gelöst")
+            return 1
     
     
     def recaptcha_wait(self, className):
@@ -126,9 +173,27 @@ class download:
                 self.browser.find_element_by_id(className)
                 stop = 1
             except Exception as e:
-                print(e)
+                # ToDo: Wenn zu viele Anfragen, beende Script
+                self.get_final()
                 sleep(3)
     
+    
+    
+    
+    def get_final(self):
+        
+        try:
+            self.browser.find_element_by_class_name("rc-doscaptcha-header")
+            show_error()
+        except:
+            return 0
+    
+    
+    
+    def show_error(self):
+        
+        self.output.status("Zu viele Anfragen des Recaptchas...")
+        quit()
     
     
     def download_audio(self, audio):
@@ -156,10 +221,10 @@ class download:
 
         try: 
             return r.recognize_google(audio, language='de-DE') 
-        
+            
         except sr.UnknownValueError: 
-            print("Google Speech Recognition could not understand audio")
-            quit()
+            self.output.status("Audio wurde nicht verstanden...")
+            return 1
 
         except sr.RequestError as e: 
             print("Could not request results from Google Speech Recognition service; {0}".format(e))
@@ -177,14 +242,15 @@ class download:
     
     
     
-    def download_video(self):
+    def hoster(self):
         
-        d = video(self.browser)
-        d.download()
+        d = video(self.browser, self.output)
+        return d.download()
     
     
     
     def delete_tabs(self):
+        self.output.status("Popups werden entfernt...")
         stop = 0
         counter = 0
         while stop == 0:
@@ -203,7 +269,6 @@ class download:
                     counter = 0
                     
             except Exception as e:
-                print("Fehler:",e)
                 
                 stop = 1
     
@@ -219,5 +284,4 @@ class download:
             else:
                 return 0
         except Exception as e:
-            print("Fehler:",e)
             return 0

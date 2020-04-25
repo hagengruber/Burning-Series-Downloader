@@ -2,6 +2,7 @@ from firefox_session import session
 from get_episode import episode
 from download import download
 from get_site import get_site
+from output import output
 
 class crawl:
     
@@ -9,6 +10,7 @@ class crawl:
         # Setzt Variablen
         
         self.link = link
+        self.output = output()
     
     
     def get_serie(self):
@@ -31,30 +33,31 @@ class crawl:
     def create_session(self):
         # Erstelle Session
         
-        print("Erstelle Firefox Session...")
-        s = session()
+        self.output.def_header("Bereite alles vor")
+        self.output.status("Session wird erstellt")
+        
+        s = session(self.output)
         self.browser = s.new_session()
-        print("Session erstellt")
     
     
     
     def get_site(self):
         # Holt Seite und prüft, ob Link korrekt war
         
-        print("Prüfe Link...")
+        self.output.status("Prüfe Link")
         s = get_site(self.link, self.browser)
         self.browser = s.get_site()
-        print("Serie gefunden")
     
     
     
     def get_episode(self):
         # Speichert alle Folgen in dictonary self.links
         
-        print("Analysiere Staffeln und Folgen...")
+        self.output.def_header("Analyse")
+        self.output.status("Analysiere Staffeln und Folgen...")
         e = episode(self.browser, self.link)
         self.links = e.get_episode()
-        print(len(self.links),"Staffel(n) gefunden")
+        self.output.status(str(len(self.links))+"Staffel(n) gefunden")
     
     
     
@@ -62,6 +65,5 @@ class crawl:
     def download(self):
         # Downloaded alle Folgen
         
-        print("Download wird gestartet...")
-        d = download(self.links, self.browser)
+        d = download(self.links, self.browser, self.output)
         d.download()
