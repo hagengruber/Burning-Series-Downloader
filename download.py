@@ -9,6 +9,7 @@ import speech_recognition as sr
 import os
 from download_video import video
 from output import output
+from tqdm import tqdm
 
 class download:
     """ Downloaded alle Folgen """
@@ -43,6 +44,8 @@ class download:
     
     
     
+    
+    
     def download_form_link(self):
         os.mkdir("Serie")
         session = 1
@@ -52,11 +55,17 @@ class download:
             episode = 1
             print(i)
             for a,b in v.items():
-                
-                r = requests.get(b)
+                self.output.status("Downloade Folge " + str(episode) + " von Staffel " + str(session))
                 des = "Serie/"+str(session)+"/"+str(episode)+".mp4"
+                r = requests.get(b, stream=True)
+                filelength = int(r.headers['Content-Length'])
+
                 with open(des, 'wb') as f:
-                    f.write(r.content)
+                    pbar = tqdm(total=int(filelength/1024))
+                    for chunk in r.iter_content(chunk_size=1024):
+                        if chunk:                   # filter out keep-alive new chunks
+                            pbar.update ()
+                            f.write(chunk)
                 episode += 1
         session += 1
     
