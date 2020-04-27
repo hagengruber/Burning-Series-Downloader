@@ -12,13 +12,14 @@ class video:
     
     
     
-    def download(self):
+    
+    def get_video(self):
         
-        return self.get_hoster()
+        return self.get_download_link()
     
     
     
-    def get_hoster(self):
+    def get_download_link(self):
         
         hoster = ["vivo"]
         rHoster = "none"
@@ -30,9 +31,11 @@ class video:
         
         if rHoster != "none":
             if rHoster == "vivo":
+                
                 return self.download_vivo()
         else:
             self.output.status("No Hoster found")
+            quit()
     
     
     def is_hoster(self, hoster):

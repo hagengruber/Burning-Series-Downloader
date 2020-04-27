@@ -27,6 +27,8 @@ class crawl:
         
         # Downloaded alle Folgen
         self.download()
+        
+        self.browser.quit()
     
     
     

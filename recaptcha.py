@@ -10,102 +10,15 @@ import os
 from video_link import video
 from output import output
 from tqdm import tqdm
-from recaptcha import recaptcha
 
-class download:
+class recaptcha:
     """ Downloaded alle Folgen """
     
-    def __init__(self, links, browser, output):
+    def __init__(self, output):
         # Speichert Variablen
         
-        self.links = links
-        self.browser = browser
-        # Zählt alle Staffeln und Serien
-        self.session = 1
-        self.episode = 1
-        self.video_Links = {}
         self.output = output
-        self.output.def_header("Hole Download Links")
     
-    
-    
-    def download(self):
-        # main function
-        
-        os.mkdir("Serie")
-        
-        
-        for i,b in self.links.items():
-            
-            os.mkdir("Serie/"+str(self.session))
-
-            self.episode = 1
-            
-            for x in b:
-                
-                self.download_from_src(self.get_site(self.links[self.session]))
-                self.episode += 1
-            
-            self.session += 1
-    
-    
-    
-    
-    
-    def download_from_src(self, link):
-        
-        
-        des = "Serie/"+str(self.session)+"/"+str(self.episode)+".mp4"
-        
-        r = requests.get(link, stream=True)
-        
-        filelength = int(r.headers['Content-Length'])
-
-        self.output.static_text("Downloade Folge " + str(self.episode) + " von Staffel " + str(self.session))
-
-        with open(des, 'wb') as f:
-            
-            pbar = tqdm(total=int(filelength/1024))
-            
-            for chunk in r.iter_content(chunk_size=1024):
-                
-                if chunk:
-                    
-                    pbar.update ()
-                    
-                    f.write(chunk)
-    
-    
-    
-    
-    
-    def get_site(self, links):
-        # Downloaded alle Folgen einer Staffel
-        
-        self.output.static_text("Staffel: "+str(self.session)+"\nFolge: "+str(self.episode))
-        stop = 0
-        
-        s = recaptcha(self.output)
-        
-        while stop == 0:
-            
-            # Holt BS Link
-            self.get_site_link(links[self.episode-1])
-            # Löst Recaptcha aus
-            
-            stop = s.solve_recaptcha(self.browser)
-            
-        self.browser = s.get_browser()
-        self.browser.switch_to.default_content()
-        self.delete_tabs()
-        
-        return self.get_links()
-    
-    
-    
-    def get_site_link(self, link):
-        
-        self.browser.get(link)
     
     
     def trigger_recaptcha(self):
@@ -127,8 +40,9 @@ class download:
     
     
     
-    def solve_recaptcha(self):
-        
+    def solve_recaptcha(self, browser):
+        self.browser = browser
+        self.trigger_recaptcha()
         sleep(5)
         self.output.status("Versuche, Recaptcha zu lösen...")
         self.browser.switch_to.frame(self.browser.find_elements_by_tag_name("iframe")[5])
@@ -155,6 +69,25 @@ class download:
         return self.control()
     
     
+    
+    def get_browser(self):
+        
+        return self.browser
+    
+    
+    def download_audio(self, audio):
+        
+        r = requests.get(audio)
+        des = "audio.mp3"
+        with open(des, 'wb') as f:
+            f.write(r.content)
+    
+    
+    
+    def convert(self):
+        
+        c = convert()
+        c.convert()
     
     
     def control(self):
@@ -207,19 +140,6 @@ class download:
         quit()
     
     
-    def download_audio(self, audio):
-        
-        r = requests.get(audio)
-        des = "audio.mp3"
-        with open(des, 'wb') as f:
-            f.write(r.content)
-    
-    
-    
-    def convert(self):
-        
-        c = convert()
-        c.convert()
     
     
     
@@ -250,13 +170,6 @@ class download:
         
         self.browser.find_element_by_id("audio-response").send_keys(text)
         self.browser.find_element_by_id("recaptcha-verify-button").click()
-    
-    
-    
-    def get_links(self):
-        
-        d = video(self.browser, self.output)
-        return d.get_video()
     
     
     
