@@ -53,21 +53,17 @@
 			
 			<ul>
 				
-				<li> kann sich ohne API Account auf Instagram authentifizieren </li>
-				<li> kann öffnetliche, als auch priavte Beiträge und Storys downloaden </li>
+				<li> kann ganze Serien als MP4-Datei Downloaden </li>
 				
 			</ul>
 
 			<h1> Systemanforderungen </h1>
 
-			<p> Der Crawler benötigt... </p>
+			<p> Der Downloader benötigt... </p>
 			
 			<ul>
 				
-				<li> einen normalen Instagram Account </li>
-				<li> Google Chrome </li>
-				<li> den dazu passenden <a href="https://chromedriver.chromium.org/downloads" target="_blank">Google Chrome Treiber</a> </li>
-				<li> das Python Paket Selemium </li>
+				<li> ... </li>
 				
 			</ul>
 
@@ -77,20 +73,20 @@
 				
 				<ul>
 					
-					<li> Kopiere die Datei 'Burning-Series-Downloader.py' und den passenden <a href="https://chromedriver.chromium.org/downloads" target="_blank">Google Chrome Treiber</a> in ein beliebiges Verzeichnis </li>
-					<li> Erstelle wie folgt ein Objekt und rufe danach die Funktion 'get_post()' auf </li>
+					<li> Kopiere den passenden <a href="https://github.com/mozilla/geckodriver/releases" target="_blank">Geckodriver</a> in den entpackten Ordner </li>
+					<li> Erstelle wie folgt ein Objekt und rufe danach die Funktion 'get_serie()' auf </li>
 					
 				</ul>
 				
 				<div class="code">
 
-					<p> from instacrawler import crawl </p>
-					<p> c = crawl('USERNAME', 'PASSWORD', 'https://www.instagram.com/ACCOUNTNAME') </p>
-					<p> c.get_post() </p>
+					<p> from main import crawl </p>
+					<p> c = crawl('https://bs.to/serie/BSLINK') </p>
+					<p> c.get_serie() </p>
 					
 				</div>
 				
-				<p> Danach werden alle Beiträge und Storys in ein mit dem Usernamen erstelltes Verzeichnis kopiert </p>
+				<p> Danach werden alle Staffeln in ein mit dem Namen der Serie erstelltes Verzeichnis kopiert </p>
 
 		</section>
 
