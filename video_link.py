@@ -21,7 +21,7 @@ class video:
     
     def get_download_link(self):
         
-        hoster = ["vivo"]
+        hoster = ["vivo", "Vidoza"]
         rHoster = "none"
         
         for i in hoster:
@@ -30,9 +30,11 @@ class video:
                 rHoster = i
         
         if rHoster != "none":
+            
             if rHoster == "vivo":
-                
                 return self.download_vivo()
+            if rHoster == "Vidoza":
+                return self.download_vidoza()
         else:
             self.output.status("No Hoster found")
             quit()
@@ -56,6 +58,14 @@ class video:
         self.output.status("Hole Video Link")
         self.browser.get(self.get_link())
         return self.play()
+    
+    
+    def download_vidoza(self):
+        
+        self.browser.get(self.browser.find_element_by_xpath("(//iframe)[4]").get_attribute("src"))
+        self.wait_video()
+        return self.browser.find_element_by_xpath("(//video)").get_attribute("src")
+    
     
     
     

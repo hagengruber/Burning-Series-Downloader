@@ -11,6 +11,7 @@ from video_link import video
 from output import output
 from tqdm import tqdm
 from recaptcha import recaptcha
+import os.path
 
 class download:
     """ Downloaded alle Folgen """
@@ -21,41 +22,67 @@ class download:
         self.links = links
         self.browser = browser
         # Zählt alle Staffeln und Serien
-        self.session = 1
+        self.session = 2
         self.episode = 1
         self.video_Links = {}
         self.output = output
         self.output.def_header("Hole Download Links")
+        self.name = self.get_name().replace("|", "")
     
-    
-    
+
+
+    def get_name(self):
+        
+        element = self.browser.find_elements_by_tag_name("small")[0]
+        self.browser.execute_script(" var element = arguments[0]; element.parentNode.removeChild(element); ", element)
+        
+        return self.browser.find_elements_by_tag_name("h2")[0].get_attribute("innerHTML").strip()
+
+
+
+
+
     def download(self):
         # main function
         
-        os.mkdir("Serie")
-        
+        try:
+            os.mkdir(self.name)
+        except:
+            self.set_session()
         
         for i,b in self.links.items():
             
-            os.mkdir("Serie/"+str(self.session))
-
-            self.episode = 1
+            if not os.path.isdir(self.name + "/" + str(self.session)):
+                os.mkdir(self.name + "/" + str(self.session))
             
-            for x in b:
+            while self.episode < len(b):
                 
                 self.download_from_src(self.get_site(self.links[self.session]))
                 self.episode += 1
             
+            self.episode = 1
             self.session += 1
     
     
     
+    def set_session(self):
+        
+        for a,b in self.links.items():
+        
+            if os.path.isdir(self.name + "/" + str(a)):
+                count = 1
+                for c in b:
+                    if os.path.isfile(self.name + "/" + str(a) + "/" + str(count) + ".mp4"):
+                        count += 1
+                    else:
+                        self.episode = count
+                        self.session = a
+                        return 0
     
     
     def download_from_src(self, link):
         
-        
-        des = "Serie/"+str(self.session)+"/"+str(self.episode)+".mp4"
+        des = self.name + "/" + str(self.session) + "/" + str(self.episode) + ".mp4"
         
         r = requests.get(link, stream=True)
         
@@ -90,7 +117,9 @@ class download:
         while stop == 0:
             
             # Holt BS Link
+            
             self.get_site_link(links[self.episode-1])
+            
             # Löst Recaptcha aus
             
             stop = s.solve_recaptcha(self.browser)
