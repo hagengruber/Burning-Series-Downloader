@@ -16,13 +16,13 @@ import os.path
 class download:
     """ Downloaded alle Folgen """
     
-    def __init__(self, links, browser, output):
+    def __init__(self, links, browser, output, session):
         # Speichert Variablen
         
         self.links = links
         self.browser = browser
         # Zählt alle Staffeln und Serien
-        self.session = 2
+        self.session = session
         self.episode = 1
         self.video_Links = {}
         self.output = output
@@ -49,19 +49,21 @@ class download:
             os.mkdir(self.name)
         except:
             self.set_session()
-        
+            
         for i,b in self.links.items():
             
-            if not os.path.isdir(self.name + "/" + str(self.session)):
-                os.mkdir(self.name + "/" + str(self.session))
-            
-            while self.episode < len(b):
+            if self.session == i:
                 
-                self.download_from_src(self.get_site(self.links[self.session]))
-                self.episode += 1
-            
-            self.episode = 1
-            self.session += 1
+                if not os.path.isdir(self.name + "/" + str(self.session)):
+                    os.mkdir(self.name + "/" + str(self.session))
+                
+                while self.episode <= len(b):
+                    
+                    self.download_from_src(self.get_site(self.links[self.session]))
+                    self.episode += 1
+                
+                self.episode = 1
+                self.session += 1
     
     
     
@@ -70,14 +72,22 @@ class download:
         for a,b in self.links.items():
         
             if os.path.isdir(self.name + "/" + str(a)):
+                
                 count = 1
+                
                 for c in b:
                     if os.path.isfile(self.name + "/" + str(a) + "/" + str(count) + ".mp4"):
                         count += 1
                     else:
                         self.episode = count
-                        self.session = a
+                        
                         return 0
+                
+            else:
+                
+                self.session = a
+                self.episode = 1
+                return 0
     
     
     def download_from_src(self, link):
@@ -98,7 +108,8 @@ class download:
                 
                 if chunk:
                     
-                    pbar.update ()
+                    pbar.update()
+                    self.output.status(str(pbar).split("|")[0].strip())
                     
                     f.write(chunk)
     
@@ -137,148 +148,6 @@ class download:
         self.browser.get(link)
     
     
-    def trigger_recaptcha(self):
-        
-        # Klickt auf "Jetzt Abspielen"
-        self.browser.find_element_by_class_name("hoster-player").click()
-        # Popup wird vermutlich getriggert
-        
-        self.delete_tabs()
-        
-        # Trigger Recaptcha
-        try:
-            self.browser.find_element_by_class_name("hoster-player").click()
-        except:
-            r = 0
-    
-    
-    
-    
-    
-    
-    def solve_recaptcha(self):
-        
-        sleep(5)
-        self.output.status("Versuche, Recaptcha zu lösen...")
-        self.browser.switch_to.frame(self.browser.find_elements_by_tag_name("iframe")[5])
-        
-        self.recaptcha_wait("recaptcha-audio-button")
-        
-        try:
-            self.browser.find_element_by_id("recaptcha-audio-button").click()
-        except:
-            return 1
-        
-        self.recaptcha_wait("audio-source")
-        
-        self.download_audio(self.browser.find_element_by_id("audio-source").get_attribute("src"))
-        
-        self.convert()
-        
-        text = self.speech_to_text()
-        if text == 1:
-            return 0
-        
-        self.solve_answer(text)
-        
-        return self.control()
-    
-    
-    
-    
-    def control(self):
-        
-        sleep(2)
-        
-        try:
-            innerHTML = self.browser.find_element_by_class_name("rc-audiochallenge-error-message").get_attribute("innerHTML")
-            if innerHTML == "":
-                self.output.status("Recaptcha wurde gelöst")
-                return 1
-            else:
-                self.output.status("Recaptcha wurde nicht gelöst... Wiederhole vorgang")
-                return 0
-        except Exception as e:
-            self.output.status("Recaptcha wurde gelöst")
-            return 1
-    
-    
-    def recaptcha_wait(self, className):
-        
-        stop = 0
-        
-        while stop == 0:
-            
-            try:
-                self.browser.find_element_by_id(className)
-                stop = 1
-            except Exception as e:
-                # ToDo: Wenn zu viele Anfragen, beende Script
-                self.get_final()
-                sleep(3)
-    
-    
-    
-    
-    def get_final(self):
-        
-        try:
-            self.browser.find_element_by_class_name("rc-doscaptcha-header")
-            show_error()
-        except:
-            return 0
-    
-    
-    
-    def show_error(self):
-        
-        self.output.status("Zu viele Anfragen des Recaptchas...")
-        quit()
-    
-    
-    def download_audio(self, audio):
-        
-        r = requests.get(audio)
-        des = "audio.mp3"
-        with open(des, 'wb') as f:
-            f.write(r.content)
-    
-    
-    
-    def convert(self):
-        
-        c = convert()
-        c.convert()
-    
-    
-    
-    def speech_to_text(self):
-        
-        r = sr.Recognizer()
-
-        with sr.WavFile('audio.wav') as source:
-            audio = r.record(source)
-
-        try: 
-            return r.recognize_google(audio, language='de-DE') 
-            
-        except sr.UnknownValueError: 
-            self.output.status("Audio wurde nicht verstanden...")
-            return 1
-
-        except sr.RequestError as e: 
-            print("Could not request results from Google Speech Recognition service; {0}".format(e))
-            quit()
-    
-    
-    
-    def solve_answer(self, text):
-        
-        os.remove("audio.mp3")
-        os.remove("audio.wav")
-        
-        self.browser.find_element_by_id("audio-response").send_keys(text)
-        self.browser.find_element_by_id("recaptcha-verify-button").click()
     
     
     

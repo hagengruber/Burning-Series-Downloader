@@ -1,31 +1,57 @@
 import os
+from tkinter import *
+from tkinter import ttk
+from time import sleep
 
 class output:
     
     def __init__(self):
-        self.header = ""
-        self.static_in = ""
+        
+        self.set_window()
+
     
-    def def_header(self, text=""):
-        
-        if text != "":
-            self.header = text
-        
-        os.system("cls")
-        print(self.header,"\n")
     
-    def static_text(self, text=""):
+    def set_window(self):
         
-        if text != "":
-            self.static_in = text
+        self.window = Tk()
         
-        os.system("cls")
-        self.def_header()
-        print(self.static_in)
+        self.window.title("Bs.to Downloader")
+        self.window.geometry('250x150') 
+        
+        self.window.update()
+        
+        self.label_header = ttk.Label(self.window, text="", borderwidth=2, relief="groove", padding=20)
+        self.label_header.grid(column=1, row=1)
+        
+        self.label_static = ttk.Label(self.window, text="")
+        self.label_static.grid(column=1, row=2)
+        
+        self.label_status = ttk.Label(self.window, text="")
+        self.label_status.grid(column=1, row=3)
+        
+        self.window.update()
+
+
+
+
+    def def_header(self, text):
+        
+        self.label_header['text'] = text
+        self.label_header.grid()
+        self.window.update()
+    
+    
+    
+    def static_text(self, text):
+        
+        self.label_static['text'] = text
+        self.label_static.grid()
+        self.window.update()
+    
+    
     
     def status(self, text):
         
-        os.system("cls")
-        self.def_header()
-        self.static_text()
-        print("Status:",text)
+        self.label_status['text'] = text
+        self.label_status.grid()
+        self.window.update()

@@ -3,14 +3,19 @@ from get_episode import episode
 from download import download
 from get_site import get_site
 from output import output
+from time import sleep
 
 class crawl:
     
-    def __init__(self, link):
+    def __init__(self, link, session=1):
         # Setzt Variablen
         
         self.link = link
         self.output = output()
+        self.session = session
+    
+    
+    
     
     
     def get_serie(self):
@@ -32,10 +37,12 @@ class crawl:
     
     
     
+    
     def create_session(self):
         # Erstelle Session
         
         self.output.def_header("Bereite alles vor")
+        
         self.output.status("Session wird erstellt")
         
         s = session(self.output)
@@ -67,5 +74,5 @@ class crawl:
     def download(self):
         # Downloaded alle Folgen
         
-        d = download(self.links, self.browser, self.output)
+        d = download(self.links, self.browser, self.output, self.session)
         d.download()
