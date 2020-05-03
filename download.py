@@ -28,6 +28,7 @@ class download:
         self.output = output
         self.output.def_header("Hole Download Links")
         self.name = self.get_name().replace("|", "")
+        self.output.def_header(self.name)
     
 
 
@@ -58,6 +59,8 @@ class download:
                     os.mkdir(self.name + "/" + str(self.session))
                 
                 while self.episode <= len(b):
+                    
+                    self.output.hoster_link("...")
                     
                     self.download_from_src(self.get_site(self.links[self.session]))
                     self.episode += 1
@@ -92,13 +95,15 @@ class download:
     
     def download_from_src(self, link):
         
+        self.output.download("...")
+        
         des = self.name + "/" + str(self.session) + "/" + str(self.episode) + ".mp4"
         
         r = requests.get(link, stream=True)
         
         filelength = int(r.headers['Content-Length'])
 
-        self.output.static_text("Downloade Folge " + str(self.episode) + " von Staffel " + str(self.session))
+        #self.output.static_text("Downloade Folge " + str(self.episode) + " von Staffel " + str(self.session))
 
         with open(des, 'wb') as f:
             
@@ -109,7 +114,7 @@ class download:
                 if chunk:
                     
                     pbar.update()
-                    self.output.status(str(pbar).split("|")[0].strip())
+                    self.output.download(str(pbar).split("|")[0].strip())
                     
                     f.write(chunk)
     
@@ -120,7 +125,7 @@ class download:
     def get_site(self, links):
         # Downloaded alle Folgen einer Staffel
         
-        self.output.static_text("Staffel: "+str(self.session)+"\nFolge: "+str(self.episode))
+        self.output.episode("Staffel: "+str(self.session)+"\nFolge: "+str(self.episode))
         stop = 0
         
         s = recaptcha(self.output)
@@ -131,6 +136,10 @@ class download:
             
             self.get_site_link(links[self.episode-1])
             
+            self.output.hoster_link("ok")
+            
+            self.output.recaptcha("...")
+            
             # Löst Recaptcha aus
             
             stop = s.solve_recaptcha(self.browser)
@@ -138,6 +147,8 @@ class download:
         self.browser = s.get_browser()
         self.browser.switch_to.default_content()
         self.delete_tabs()
+        
+        self.output.recaptcha("ok")
         
         return self.get_links()
     
@@ -159,7 +170,6 @@ class download:
     
     
     def delete_tabs(self):
-        self.output.status("Popups werden entfernt...")
         stop = 0
         counter = 0
         while stop == 0:

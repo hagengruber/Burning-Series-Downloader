@@ -36,7 +36,7 @@ class video:
             if rHoster == "Vidoza":
                 return self.download_vidoza()
         else:
-            self.output.status("No Hoster found")
+            self.output.video_link("No Hoster found")
             quit()
     
     
@@ -55,7 +55,7 @@ class video:
     
     def download_vivo(self):
         
-        self.output.status("Hole Video Link")
+        self.output.video_link("Hole Video Link")
         self.browser.get(self.get_link())
         return self.play()
     
@@ -78,7 +78,7 @@ class video:
     def play(self):
         
         self.wait_video()
-        self.output.status("Video Link gefunden")
+        self.output.video_link("ok")
         return self.browser.find_element_by_tag_name("source").get_attribute("src")
     
     

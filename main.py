@@ -21,6 +21,8 @@ class crawl:
     def get_serie(self):
         # main function
         
+        self.output.ready("...")
+        
         # Chrome Session erstellen
         self.create_session()
         
@@ -29,6 +31,8 @@ class crawl:
         
         # Erstellt einen Array mit den einzelnen Folgen
         self.get_episode()
+        
+        self.output.ready("ok")
         
         # Downloaded alle Folgen
         self.download()
@@ -41,10 +45,6 @@ class crawl:
     def create_session(self):
         # Erstelle Session
         
-        self.output.def_header("Bereite alles vor")
-        
-        self.output.status("Session wird erstellt")
-        
         s = session(self.output)
         self.browser = s.new_session()
     
@@ -53,7 +53,6 @@ class crawl:
     def get_site(self):
         # Holt Seite und prüft, ob Link korrekt war
         
-        self.output.status("Prüfe Link")
         s = get_site(self.link, self.browser)
         self.browser = s.get_site()
     
@@ -62,11 +61,9 @@ class crawl:
     def get_episode(self):
         # Speichert alle Folgen in dictonary self.links
         
-        self.output.def_header("Analyse")
-        self.output.status("Analysiere Staffeln und Folgen...")
         e = episode(self.browser, self.link)
         self.links = e.get_episode()
-        self.output.status(str(len(self.links))+"Staffel(n) gefunden")
+        #self.output.status(str(len(self.links))+"Staffel(n) gefunden")
     
     
     

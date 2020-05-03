@@ -44,7 +44,6 @@ class recaptcha:
         self.browser = browser
         self.trigger_recaptcha()
         sleep(5)
-        self.output.status("Versuche, Recaptcha zu lösen...")
         self.browser.switch_to.frame(self.browser.find_elements_by_tag_name("iframe")[5])
         
         self.recaptcha_wait("recaptcha-audio-button")
@@ -97,13 +96,10 @@ class recaptcha:
         try:
             innerHTML = self.browser.find_element_by_class_name("rc-audiochallenge-error-message").get_attribute("innerHTML")
             if innerHTML == "":
-                self.output.status("Recaptcha wurde gelöst")
                 return 1
             else:
-                self.output.status("Recaptcha wurde nicht gelöst... Wiederhole vorgang")
                 return 0
         except Exception as e:
-            self.output.status("Recaptcha wurde gelöst")
             return 1
     
     
@@ -136,7 +132,7 @@ class recaptcha:
     
     def show_error(self):
         
-        self.output.status("Zu viele Anfragen des Recaptchas...")
+        self.output.recaptcha("Zu viele Anfragen")
         quit()
     
     
@@ -153,8 +149,7 @@ class recaptcha:
         try: 
             return r.recognize_google(audio, language='de-DE') 
             
-        except sr.UnknownValueError: 
-            self.output.status("Audio wurde nicht verstanden...")
+        except sr.UnknownValueError:
             return 1
 
         except sr.RequestError as e: 
@@ -174,7 +169,6 @@ class recaptcha:
     
     
     def delete_tabs(self):
-        self.output.status("Popups werden entfernt...")
         stop = 0
         counter = 0
         while stop == 0:
