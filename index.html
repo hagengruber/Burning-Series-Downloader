@@ -87,6 +87,17 @@
 				</div>
 				
 				<p> Danach werden alle Staffeln in ein mit dem Namen der Serie erstelltes Verzeichnis kopiert </p>
+				
+				<p> Alternativ kann die grafische Oberfläche, die mit <a href="https://de.wikipedia.org/wiki/Tkinter" target="_blank">Tkinter</a> implementiert wurde, deaktiviert werden: </p>
+
+				<div class="code">
+
+					<p> from main import crawl </p>
+					<p> c = crawl('https://bs.to/serie/BSLINK') </p>
+					<p> c.gui = "off" </p>
+					<p> c.get_serie() </p>
+					
+				</div>
 
 		</section>
 
