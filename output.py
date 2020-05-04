@@ -4,9 +4,14 @@ from tkinter import ttk
 
 class output:
     
-    def __init__(self):
+    def __init__(self, gui):
         
-        self.set_window()
+        self.gui = gui
+        if self.gui != "off":
+            self.set_window()
+        else:
+            self.header = ""
+            self.text_episode = ""
 
     
     
@@ -64,52 +69,96 @@ class output:
 
     def def_header(self, text):
         
-        self.label_header['text'] = text
-        self.label_header.grid()
-        self.window.update()
+        if self.gui != "off":
+        
+            self.label_header['text'] = text
+            self.label_header.grid()
+            self.window.update()
+        
+        else:
+        
+            self.header = text
+            print(self.header)
     
     
     
     def episode(self, text):
         
-        self.label_episode['text'] = text
-        self.label_episode.grid()
-        self.window.update()
+        if self.gui != "off":
+        
+            self.label_episode['text'] = text
+            self.label_episode.grid()
+            self.window.update()
+        
+        else:
+            
+            os.system("cls")
+            self.text_episode = text
+            print(self.header, "\n", self.text_episode)
     
     
     def ready(self, text):
         
-        self.label_link_ready['text'] = text
-        self.label_link_ready.grid()
-        self.window.update()
+        if self.gui != "off":
+        
+            self.label_link_ready['text'] = text
+            self.label_link_ready.grid()
+            self.window.update()
+        
+        else:
+            
+            os.system("cls")
+            print(self.header, "\n", self.text_episode, "\n", "Firefox Session wurde erstellt")
     
     
     
     def hoster_link(self, text):
-    
-        self.label_link_solve['text'] = text
-        self.label_link_solve.grid()
-        self.window.update()
+        
+        if self.gui != "off":
+        
+            self.label_link_solve['text'] = text
+            self.label_link_solve.grid()
+            self.window.update()
+        
+        else:
+            
+            os.system("cls")
+            print(self.header, "\n", self.text_episode, "\n", "Folge wurde gefunden")
     
     
     
     def recaptcha(self, text):
         
-        self.label_rec_solve['text'] = text
-        self.label_rec_solve.grid()
-        self.window.update()
+        if self.gui != "off":
+        
+            self.label_rec_solve['text'] = text
+            self.label_rec_solve.grid()
+            self.window.update()
+        
+        else:
+            
+            os.system("cls")
+            print(self.header, "\n", self.text_episode, "\n", "Recaptcha wurde gelöst")
     
     
     def download(self, text):
         
-        self.label_download_solve['text'] = text
-        self.label_download_solve.grid()
-        self.window.update()
+        if self.gui != "off":
+        
+            self.label_download_solve['text'] = text
+            self.label_download_solve.grid()
+            self.window.update()
     
     
     
     def video_link(self, text):
         
-        self.label_video_solve['text'] = text
-        self.label_video_solve.grid()
-        self.window.update()
+        if self.gui != "off":
+        
+            self.label_video_solve['text'] = text
+            self.label_video_solve.grid()
+            self.window.update()
+        
+        else:
+            
+            print("Download wird vorbereitet")

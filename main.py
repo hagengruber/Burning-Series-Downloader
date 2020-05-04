@@ -11,8 +11,8 @@ class crawl:
         # Setzt Variablen
         
         self.link = link
-        self.output = output()
         self.session = session
+        self.gui = "on"
     
     
     
@@ -20,6 +20,8 @@ class crawl:
     
     def get_serie(self):
         # main function
+        
+        self.output = output(self.gui)
         
         self.output.ready("...")
         
