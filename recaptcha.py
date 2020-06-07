@@ -38,13 +38,15 @@ class recaptcha:
     
     
     
-    
-    
     def solve_recaptcha(self, browser):
+        
         self.browser = browser
         self.trigger_recaptcha()
-        sleep(5)
-        self.browser.switch_to.frame(self.browser.find_elements_by_tag_name("iframe")[5])
+        
+        try:
+            self.browser.switch_to.frame(self.browser.find_elements_by_tag_name("iframe")[5])
+        except:
+            return 1
         
         self.recaptcha_wait("recaptcha-audio-button")
         

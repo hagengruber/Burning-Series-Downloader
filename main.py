@@ -7,11 +7,11 @@ from time import sleep
 
 class crawl:
     
-    def __init__(self, link, session=1):
+    def __init__(self, link):
         # Setzt Variablen
         
         self.link = link
-        self.session = session
+        self.session = 1
         self.gui = "on"
     
     

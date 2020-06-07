@@ -88,9 +88,12 @@ class download:
                 
             else:
                 
-                self.session = a
-                self.episode = 1
-                return 0
+                if not self.session > a:
+                    
+                
+                    self.session = a
+                    self.episode = 1
+                    return 0
     
     
     def download_from_src(self, link):
