@@ -1,7 +1,7 @@
 # Burning-Series-Downloader
 Downloaded alle Staffeln einer beliebigen Serie
 
-<br><a href="https://implod3.github.io/Druckerverwaltungstool" target="_blank"> View Github Page </a>
+<br><a href="https://implod3.github.io/Burning-Series-Downloader" target="_blank"> View Github Page </a>
 
 <br><br>
 
