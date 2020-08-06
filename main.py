@@ -49,6 +49,7 @@ class crawl:
         
         s = session(self.output)
         self.browser = s.new_session()
+        exit()
     
     
     
